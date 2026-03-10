@@ -1,19 +1,36 @@
-# Personal data — never commit these
+# ─── Personal data — never commit these ───
 playerIDs.txt
 seen_codes.json
 
-# Auto-generated folders
+# ─── Auto-generated folders ───
 logs/
 screenshots/
 
-# Python
+# ─── Selenium / Chrome ───
+.selenium_cache/
+chromedriver*
+*.crdownload
+
+# ─── Python ───
 __pycache__/
 *.py[cod]
 *.pyo
+*.pyd
 .env
 venv/
+env/
 .venv/
+*.egg-info/
+dist/
+build/
 
-# OS files
+# ─── OS files ───
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# ─── IDE files ───
+.vscode/
+.idea/
+*.swp
+*.swo
