@@ -19,14 +19,16 @@ from redeemer import redeem_code_for_all_players
 
 # ─── Config ────────────────────────────────────────────────────────────────────
 API_URL          = "https://kingshot.net/api/gift-codes"
-PLAYER_IDS_FILE  = "playerIDs.txt"
-SEEN_CODES_FILE  = "seen_codes.json"   # Tracks codes we've already processed
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PLAYER_IDS_FILE  = os.path.join(BASE_DIR, "playerIDs.txt")
+SEEN_CODES_FILE  = os.path.join(BASE_DIR, "seen_codes.json")  # Tracks codes we've already processed
+LOGS_DIR         = os.path.join(BASE_DIR, "logs")
 CHECK_INTERVAL   = 15                  # How often to poll the API (minutes)
 # ───────────────────────────────────────────────────────────────────────────────
 
 # Set up logging to both console and file
-os.makedirs("logs", exist_ok=True)
-log_filename = f"logs/run_{datetime.now().strftime('%Y%m%d')}.log"
+os.makedirs(LOGS_DIR, exist_ok=True)
+log_filename = os.path.join(LOGS_DIR, f"run_{datetime.now().strftime('%Y%m%d')}.log")
 
 logging.basicConfig(
     level=logging.INFO,
