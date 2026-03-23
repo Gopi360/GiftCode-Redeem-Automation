@@ -71,25 +71,47 @@ def wait_for_clickable(wait, by, value, description="button"):
 
 def get_result_message(driver, wait) -> str:
     """
-    Try to grab the result popup/toast message after clicking Confirm.
-    Returns the text or a fallback string.
+    only reads messages from the result-modal (.message_modal > .modal_content > p.msg).
     """
-    # Common patterns for result messages (success toast, error dialog, etc.)
-    selectors = [
-        (By.XPATH, '//*[contains(@class,"result") or contains(@class,"toast") or contains(@class,"modal") or contains(@class,"tip") or contains(@class,"message")]'),
-        (By.XPATH, '//div[contains(@class,"popup")]'),
-        (By.XPATH, '//div[contains(@class,"dialog")]'),
-    ]
-    time.sleep(POST_CONFIRM_WAIT)
-    for by, xpath in selectors:
+    # wait for site to animate popup
+    time.sleep(0.5)
+    # wait for visibility of the modal
+    try:
+        modal = wait.until(EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, ".message_modal .modal_content")
+        ))
+    except TimeoutException:
+        # fallback - wait another second for it to popup
+        time.sleep(1.0)
         try:
-            elements = driver.find_elements(by, xpath)
-            for el in elements:
-                text = el.text.strip()
-                if text and len(text) > 3:
-                    return text
+            modal = driver.find_element(By.CSS_SELECTOR, ".message_modal .modal_content")
+            if not modal.is_displayed():
+                return "(result modal not visible)"
         except Exception:
-            continue
+            return "(no result modal)"
+    # catch the text-string
+    try:
+        msg_el = modal.find_element(By.CSS_SELECTOR, "p.msg")
+        text = (msg_el.text or "").strip()
+        if text:
+            return text
+    except Exception:
+        pass
+    # fallback: innerText / textContent
+    try:
+        msg_el = modal.find_element(By.CSS_SELECTOR, "p.msg")
+        text = (msg_el.get_attribute("innerText") or msg_el.get_attribute("textContent") or "").strip()
+        if text:
+            return text
+    except Exception:
+        pass
+    # 4) last try: complete modal-text (without html fragments)
+    try:
+        text = (modal.text or "").strip()
+        if text:
+            return text
+    except Exception:
+        pass
     return "(no result message captured)"
 
 
